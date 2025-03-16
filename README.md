@@ -1,5 +1,9 @@
 # Time Manager
 
+This project is part of our Software Engineering Development Internship, aiming to develop a web-based application integrating a course schedule and calendar.
+
+本项目是我们软件工程开发实习的一部分，目标是开发一个基于 Web 的应用，集成课程表和日历功能。
+
 This template should help you get started developing with Vue 3 in Vite.
 
 此模板可以帮助您使用 Vue 3 和 Vite 进行开发。
