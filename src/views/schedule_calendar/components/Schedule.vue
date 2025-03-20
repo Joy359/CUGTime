@@ -162,14 +162,19 @@ const handleDelete = (id: number) => {
     <!-- 编辑/新增日程的弹窗 -->
     <el-dialog v-model="dialogVisible" :title="isEditing ? '编辑日程' : '新建日程'" width="450px">
       <el-form label-width="80px">
+        <!-- 时间选择器（移除 arrow-control，恢复鼠标滚轮选择时间） -->
         <el-form-item label="时间" required>
           <el-time-picker
               v-model="currentSchedule.time"
               format="HH:mm"
               value-format="HH:mm"
               placeholder="选择时间"
+              size="large"
+              clearable
           />
         </el-form-item>
+
+        <!-- 日程标题 -->
         <el-form-item label="标题" required>
           <el-input
               v-model="currentSchedule.title"
@@ -178,6 +183,8 @@ const handleDelete = (id: number) => {
               show-word-limit
           />
         </el-form-item>
+
+        <!-- 日程状态 -->
         <el-form-item label="状态">
           <el-switch
               v-model="currentSchedule.completed"
@@ -186,11 +193,15 @@ const handleDelete = (id: number) => {
           />
         </el-form-item>
       </el-form>
+
+      <!-- 按钮 -->
       <template #footer>
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" @click="submitForm">确认保存</el-button>
       </template>
     </el-dialog>
+
+
   </div>
 </template>
 
@@ -245,6 +256,15 @@ const handleDelete = (id: number) => {
   padding: 40px 0;
   color: #909399;
   text-align: center;
+}
+/* 让时间选择器更容易点击 */
+.el-time-picker {
+  width: 100%;
+}
+
+/* 让输入框更整齐 */
+.el-input {
+  width: 100%;
 }
 
 </style>
