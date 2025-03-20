@@ -1,67 +1,79 @@
+// 设置整个页面的背景颜色
 .body {
-  background-color: #1f293a;
+  background-color: #1f293a; // 深蓝色背景，适合夜间模式
 }
 
+// 容器样式
 .wrapper {
-  width: 55%;
-  height: 63%;
-  margin: auto;
-  overflow: hidden;
-  background-color: rgb(42 107 141 / 45%);
-  border: 1px solid rgb(14 255 239 / 30%);
-  border-radius: 20px;
+  width: 55%; // 宽度占视口的55%
+  height: 63%; // 高度占视口的63%
+  margin: auto; // 居中对齐
+  overflow: hidden; // 隐藏溢出内容
+  background-color: rgb(42 107 141 / 45%); // 半透明深蓝色背景
+  border: 1px solid rgb(14 255 239 / 30%); // 细边框，颜色带透明度
+  border-radius: 20px; // 圆角边框
   box-shadow:
-    0 0 15px rgb(14 255 239 / 30%),
-    inset 0 0 10px rgb(14 255 239 / 20%);
-  backdrop-filter: blur(8px);
+          0 0 15px rgb(14 255 239 / 30%), // 外部发光效果
+          inset 0 0 10px rgb(14 255 239 / 20%); // 内部阴影，提升立体感
+  backdrop-filter: blur(8px); // 模糊背景，增强玻璃拟态效果
 }
 
+// 欢迎面板样式
 .welcome-panel {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  position: relative; // 设定相对定位
+  display: flex; // 使用Flexbox布局
+  flex-direction: column; // 子元素纵向排列
+  align-items: center; // 子元素居中对齐
+  justify-content: center; // 水平和垂直方向都居中
 }
 
-// 一条美观的分割线
+// 一条美观的分割线（欢迎面板右侧）
 .welcome-panel::after {
-  position: absolute;
-  top: 50%;
-  right: -1px;
-  width: 2px;
-  height: 70%;
-  content: '';
-  background: linear-gradient(180deg, rgb(14 255 239 / 0%) 0%, #0ef 50%, rgb(14 255 239 / 0%) 100%);
-  box-shadow: 0 0 15px rgb(14 255 239 / 30%);
-  transform: translateY(-50%);
+  position: absolute; // 绝对定位
+  top: 50%; // 从顶部50%开始
+  right: -1px; // 使其紧贴右侧
+  width: 2px; // 细线宽度
+  height: 70%; // 高度占70%
+  content: ''; // 伪元素必须有内容
+  background: linear-gradient(
+                  180deg,
+                  rgb(14 255 239 / 0%) 0%, // 渐变起点，完全透明
+                  #0ef 50%, // 渐变中点，高亮青色
+                  rgb(14 255 239 / 0%) 100% // 渐变终点，完全透明
+  );
+  box-shadow: 0 0 15px rgb(14 255 239 / 30%); // 添加光晕效果
+  transform: translateY(-50%); // 使其垂直居中
 }
 
+// 欢迎面板内的文本样式
 .welcome-panel span {
-  padding: 5px;
-  font-size: 2rem;
-  font-weight: 600;
-  color: #0ef;
-  text-align: center;
+  padding: 5px; // 内边距
+  font-size: 2rem; // 字号较大
+  font-weight: 600; // 半粗体
+  color: #0ef; // 高亮青色
+  text-align: center; // 居中文本
 }
 
+// 认证面板（可能是登录框）样式
 .auth-panel {
-  padding: 40px;
-  background: rgb(255 255 255 / 5%);
+  padding: 40px; // 内边距较大，增强间距感
+  background: rgb(255 255 255 / 5%); // 轻微的透明白色背景，增加层次感
 }
 
+// 时钟组件样式
 .clock {
-  display: block;
-  margin: 90px auto;
+  display: block; // 作为块级元素
+  margin: 90px auto; // 水平居中，且顶部有较大间距
 }
 
-// 移动端适配 当屏幕宽度小于768px时，隐藏welcome-panel
+// 移动端适配（当屏幕宽度小于等于768px时）
 @media screen and (width <= 768px) {
   .welcome-panel {
-    display: none; // 双重保障隐藏
+    display: none; // 隐藏欢迎面板，避免占用过多空间
   }
 
   .auth-panel {
-    padding: 20px;
+    padding: 20px; // 减小认证面板的内边距，适应小屏幕
   }
 }
+
