@@ -122,12 +122,25 @@ const selectDate = (type: CalendarDateType) => {
   height: 100%;
   padding: 8px;
   font-size: 14px;
+  border-radius: 6px; /* 添加圆角 */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* 颜色和缩放渐变 */
+}
+
+/* 鼠标悬停时高亮 */
+.calendar-cell:hover {
+  transform: scale(1.05); /* 轻微放大 */
 }
 
 /* 公历日期数字样式（如“10”表示10号） */
 .solar-date {
   margin-bottom: 2px;
   font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+/* 鼠标悬停时公历日期变色 */
+.calendar-cell:hover .solar-date {
+  color: #0ef; /* 亮青色 */
 }
 
 /* 节日文本样式 */
@@ -136,18 +149,26 @@ const selectDate = (type: CalendarDateType) => {
   font-weight: 500;
   line-height: 1.2;
   color: #f56c6c; /* 默认红色 */
+  transition: color 0.3s ease;
 }
 
 /* 节气文本样式 */
 .term {
   font-size: 12px;
   color: #67c23a; /* 绿色表示节气 */
+  transition: color 0.3s ease;
 }
 
 /* 农历日期文本样式 */
 .lunar-day {
   font-size: 12px;
   color: #909399; /* 灰色，表示普通农历日期 */
+  transition: color 0.3s ease;
+}
+
+/* 鼠标悬停时农历日期高亮 */
+.calendar-cell:hover .lunar-day {
+  color: #ff9800; /* 橙色 */
 }
 
 /* 公历节日样式（红色） */
@@ -155,8 +176,24 @@ const selectDate = (type: CalendarDateType) => {
   color: #f56c6c;
 }
 
+/* 鼠标悬停时公历节日变亮 */
+.calendar-cell:hover .festival.solar {
+  color: #ff3b3b;
+}
+
 /* 农历节日样式（橙色） */
 .festival.lunar {
   color: #e6a23c;
 }
+
+/* 鼠标悬停时农历节日变亮 */
+.calendar-cell:hover .festival.lunar {
+  color: #ff8c00;
+}
+
+/* 鼠标离开时，颜色渐变恢复 */
+.calendar-cell {
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+}
 </style>
+
