@@ -3,6 +3,16 @@
 import Sidebar from './Siderbar/Sidebar.vue'
 import Header from './header/Header.vue'
 import Footer from './footer/Footer.vue'
+import { onMounted } from 'vue'
+import { useProcessStore } from '@/store/process.ts'
+import { usePlanStore } from '@/store/plan.ts'
+const processStore = useProcessStore()
+const planStore = usePlanStore()
+// 组件挂载时自动加载数据
+onMounted(() => {
+  planStore.loadPlanMap()
+  processStore.loadProcessMap()
+})
 </script>
 
 <template>
@@ -25,6 +35,9 @@ import Footer from './footer/Footer.vue'
 </template>
 
 <style scoped lang="scss">
+.body {
+  overflow: hidden;
+}
 .sidebar {
   width: 200px;
   padding: 10px;
@@ -42,7 +55,7 @@ import Footer from './footer/Footer.vue'
 }
 
 .main {
-  flex: 1;
+  width: 100%;
   padding: 20px;
   overflow-y: auto; /* 垂直滚动条 */
   color: #333; /* 深色文字 */

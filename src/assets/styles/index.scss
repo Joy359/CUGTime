@@ -1,14 +1,55 @@
 // 全局共同样式
-@use './reset' as *;
+@use './reset';
 
-.body {
-  display: flex;
-  width: 100%;
-  min-height: 100vh;
-}
-
+.body,
 .container {
   display: flex;
   width: 100%;
-  min-height: 100%;
+}
+
+.body {
+  height: 100vh;
+}
+
+.container {
+  height: 100%;
+}
+
+.el-dialog {
+  &.my-global-dialog {
+    width: 500px;
+    padding: 20px 60px 40px;
+    .el-dialog__header {
+      width: 100%;
+      font-weight: bold;
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+      border-bottom: 1px solid #ebeef5; // 浅灰色分割线
+      .el-dialog__title {
+        font-size: 24px;
+      }
+    }
+    .el-dialog__body {
+      width: 100%;
+    }
+    .el-dialog__footer {
+      width: 100%;
+      display: flex;
+      justify-content: space-evenly;
+    }
+  }
+}
+
+.el-form {
+  &.my-global-form {
+    width: 100%;
+    .el-form-item__label {
+      width: 80px;
+      justify-content: left;
+    }
+    .el-input {
+      width: 100%;
+    }
+  }
 }

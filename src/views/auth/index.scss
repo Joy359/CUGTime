@@ -1,0 +1,64 @@
+.body {
+  background-color: #1f293a;
+}
+
+.wrapper {
+  width: 55%;
+  height: 70%;
+  margin: auto;
+  background-color: rgb(42 107 141 / 45%);
+  border: 1px solid rgb(14 255 239 / 30%);
+  border-radius: 20px;
+  box-shadow:
+    0 0 15px rgb(14 255 239 / 30%),
+    inset 0 0 10px rgb(14 255 239 / 20%);
+  backdrop-filter: blur(8px);
+}
+
+.welcome-panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+// 一条美观的分割线
+.welcome-panel::after {
+  position: absolute;
+  top: 50%;
+  right: -1px;
+  width: 2px;
+  height: 70%;
+  content: '';
+  background: linear-gradient(180deg, rgb(14 255 239 / 0%) 0%, #0ef 50%, rgb(14 255 239 / 0%) 100%);
+  box-shadow: 0 0 15px rgb(14 255 239 / 30%);
+  transform: translateY(-50%);
+}
+
+.welcome-panel span {
+  padding: 5px;
+  font-size: 2rem;
+  font-weight: 600;
+  color: #0ef;
+  text-align: center;
+}
+
+.auth-panel {
+  background: rgb(255 255 255 / 5%);
+}
+
+.clock {
+  margin: 90px auto;
+}
+
+// 移动端适配 当屏幕宽度小于768px时，隐藏welcome-panel
+@media screen and (width <= 768px) {
+  .welcome-panel {
+    display: none;
+  }
+
+  .auth-panel {
+    padding: 20px;
+  }
+}

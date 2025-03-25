@@ -15,7 +15,6 @@ function handleSelect(key: string | number, keyPath: Array<string | number>) {
 <style scoped>
 .header-menu {
   justify-content: flex-end;
-
   --el-menu-bg-color: #606266;
 }
 </style>

@@ -3,7 +3,7 @@ export const routes = [
     path: '/',
     component: () => import('@/layout/index.vue'),
     name: 'layout',
-    redirect: '/home',
+    redirect: '/login',
     meta: {
       title: 'layout',
       show: true,
@@ -14,7 +14,7 @@ export const routes = [
         component: () => import('@/views/home/index.vue'),
         name: 'home',
         meta: {
-          title: '首页',
+          title: '系统首页',
           show: true,
         },
       },
@@ -37,13 +37,32 @@ export const routes = [
         },
       },
       {
-        path: '/homework',
-        component: () => import('@/views/homework_manager/index.vue'),
-        name: 'homework',
+        path: '/study',
+        name: 'plan',
         meta: {
-          title: '作业管理',
+          title: '学程规划',
           show: true,
         },
+        children: [
+          {
+            path: '/study/plan',
+            component: () => import('@/views/study_plan/index.vue'),
+            name: 'course-homework',
+            meta: {
+              title: '学习计划',
+              show: true,
+            },
+          },
+          {
+            path: '/study/process',
+            component: () => import('@/views/study_process/index.vue'),
+            name: 'study-progress',
+            meta: {
+              title: '学习过程',
+              show: true,
+            },
+          },
+        ],
       },
       {
         path: '/todo',
@@ -54,43 +73,45 @@ export const routes = [
           show: true,
         },
       },
-      {
-        path: '/friends',
-        component: () => import('@/views/friends/index.vue'),
-        name: 'friends',
-        meta: {
-          title: '我的好友',
-          show: true,
-        },
-      },
-      {
-        path: '/shared-calendar',
-        component: () => import('@/views/shared_calendar/index.vue'),
-        name: 'shared-calendar',
-        meta: {
-          title: '共享日历',
-          show: true,
-        },
-      },
-      {
-        path: '/ai-assistant',
-        component: () => import('@/views/ai_assistant/index.vue'),
-        name: 'ai-assistant',
-        meta: {
-          title: 'AI助手',
-          show: true,
-        },
-      },
     ],
   },
   {
-    path: '/login',
-    component: () => import('@/views/login/index.vue'),
-    name: 'login',
+    path: '/auth',
+    component: () => import('@/views/auth/index.vue'),
+    name: 'auth',
     meta: {
-      title: '登录', // 路由标题
+      title: '登录认证',
       show: false,
     },
+    children: [
+      {
+        path: '/login',
+        component: () => import('@/views/auth/components/LoginForm.vue'),
+        name: 'login',
+        meta: {
+          title: '登录',
+          show: false,
+        },
+      },
+      {
+        path: '/register',
+        component: () => import('@/views/auth/components/RegisterForm.vue'),
+        name: 'register',
+        meta: {
+          title: '注册',
+          show: false,
+        },
+      },
+      {
+        path: '/forgot-password',
+        component: () => import('@/views/auth/components/ForgotPassword.vue'),
+        name: 'forgot-password',
+        meta: {
+          title: '忘记密码',
+          show: false,
+        },
+      },
+    ],
   },
   {
     path: '/404',
