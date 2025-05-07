@@ -40,34 +40,27 @@ const handleChecked = (id: number) => {
 
 <template>
   <div class="container">
-    <el-tooltip
-      :content="item.description || '无描述'"
-      placement="bottom"
-      :show-after="100"
-      effect="light"
-    >
-      <div class="item-content" :class="categoryKey">
-        <!-- 复选框 -->
-        <el-checkbox
-          @click="handleChecked(item.id)"
-          :checked="categoryKey === 'completed'"
-        ></el-checkbox>
-        <!-- 优先级显示 -->
-        <el-tag
-          :type="
-            item.priority === 'high' ? 'danger' : item.priority === 'medium' ? 'warning' : 'info'
-          "
-        >
-          {{ item.priority }}
-        </el-tag>
-        <!-- 日历小图标  -->
-        <el-icon :size="12"><Calendar /></el-icon>
-        <!-- 截止日期 -->
-        <el-tag v-if="item.deadline" class="deadline">{{ myFormatDate(item.deadline) }}</el-tag>
-        <!-- 任务标题 -->
-        <span class="todo-title">{{ item.title }}</span>
-      </div>
-    </el-tooltip>
+    <div class="item-content" :class="categoryKey">
+      <!-- 复选框 -->
+      <el-checkbox
+        @click="handleChecked(item.id)"
+        :checked="categoryKey === 'completed'"
+      ></el-checkbox>
+      <!-- 优先级显示 -->
+      <el-tag
+        :type="
+          item.priority === 'high' ? 'danger' : item.priority === 'medium' ? 'warning' : 'info'
+        "
+      >
+        {{ item.priority }}
+      </el-tag>
+      <!-- 日历小图标  -->
+      <el-icon :size="12"><Calendar /></el-icon>
+      <!-- 截止日期 -->
+      <el-tag v-if="item.deadline" class="deadline">{{ myFormatDate(item.deadline) }}</el-tag>
+      <!-- 任务标题 -->
+      <span class="todo-title">{{ item.title }}</span>
+    </div>
     <!-- 提醒时间显示-->
     <div class="item-remind" v-if="item.reminderTime">
       提醒我：
@@ -108,7 +101,6 @@ $text-regular: #606266;
 $border-color: #ebeef5;
 .container {
   justify-content: space-between;
-  align-items: center;
 }
 .item-content {
   width: 40%;
@@ -147,7 +139,7 @@ $border-color: #ebeef5;
     color: $danger;
   }
 }
-.item-remind {
+.item-remind{
   width: 20%;
 }
 .item-update {

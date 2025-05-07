@@ -14,15 +14,30 @@ export default defineConfig({
     vueDevTools(),
     // ElementPlus 自动导入
     AutoImport({
-      resolvers: [ElementPlusResolver()]
+      resolvers: [ElementPlusResolver()],
     }),
     Components({
-      resolvers: [ElementPlusResolver()]
-    })
+      resolvers: [ElementPlusResolver()],
+    }),
   ],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
+  server: {
+    host: '0.0.0.0',
+    open: true,
+    proxy: {
+      '/api': {
+        // 代理标识符
+        target: 'http://172.27.115.10:8080',
+        changeOrigin: true,
+        rewrite: (path) => {
+          const newPath = path.replace(/^\/api/, '')
+          return newPath
+        },
+      },
     },
   },
 })

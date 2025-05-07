@@ -1,26 +1,14 @@
-import { computed, reactive, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
-import type {TodoCategory, TodoItem } from '@/types/todo'
-import { dayjs, ElMessage } from 'element-plus'
+import type { TodoCategory, TodoForm, TodoItem } from '@/types/todo'
+import { dayjs } from 'element-plus'
 import { apiFetchTodoList, apiUpdateTodo, apiDeleteTodo, apiAddTodo } from '@/api/todo/index.ts'
+import { covertDeadlineAndReminderTime } from '@/utils/timeHelper.ts'
 
 export const useTodoStore = defineStore('todo', () => {
   // 待办列表
   const todoList = ref<TodoItem[]>([])
-  // 当前操作的待办对象
-  const currentTodo = reactive<TodoItem>({
-    id: Date.now(),
-    title: '',
-    priority: 'medium',
-    deadline: undefined,
-    description: '',
-    isCompleted: false,
-    updatedAt: new Date(),
-    repeat: 'none',
-  })
-
-  // 表单数据缓存，用于判断表单数据是否发生改变
-  const currentTodoCache = ref<TodoItem>()
+  const currentTodoId = ref(0)
 
   // loading 表示应用是否在从服务器加载数据
   // 页面初次加载，用户刷新数据，提交表单后，loading均为true
@@ -34,7 +22,7 @@ export const useTodoStore = defineStore('todo', () => {
   // 今日(未完成且今天截止) => today
   // 明日(未完成且明天截止) => tomorrow
   // 即将(未完成且未来截止) => future
-  const getCategory = ({ isCompleted, deadline }: TodoItem) => {
+  const getCategory = ({ isCompleted, deadline }: TodoItem | TodoForm) => {
     const now = dayjs()
     const todoDate = dayjs(deadline)
     if (isCompleted) return 'completed'
@@ -77,71 +65,65 @@ export const useTodoStore = defineStore('todo', () => {
     }
   }
 
-  // 重置表单
-  const resetTodoForm = () => {
-    currentTodo.title = ''
-    currentTodo.priority = 'medium'
-    currentTodo.deadline = undefined
-    currentTodo.description = ''
-    currentTodo.isCompleted = false
-    currentTodo.repeat = 'none'
-  }
   // 切换状态 已完成/待处理
   const toggleTodoStatus = async (todoId: number) => {
-    try {
-      // 通过ID查找到相应的待办事项，如果没找到则返回
-      const todoItem = todoList.value.find((t) => t.id === todoId)
-      if (!todoItem) return
-      // 切换状态 已完成=>待处理  待处理=>已完成
-      const newStatus = !todoItem.isCompleted
-      // 向服务器发送更新请求 ...todoItem是对象展开运算符，用于将todoItem对象的所有属性拷贝到新对象中
-      await apiUpdateTodo({ ...todoItem, updatedAt: new Date(), isCompleted: newStatus })
-      todoItem.isCompleted = newStatus
-      todoItem.updatedAt = new Date()
-    } catch {
-      ElMessage.error('更新失败')
-    }
+    // 通过ID查找到相应的待办事项，如果没找到则返回
+    const todoItem = todoList.value.find((t) => t.id === todoId)
+    if (!todoItem) return
+    // 切换状态 已完成=>待处理  待处理=>已完成
+    const newStatus = !todoItem.isCompleted
+    // 向服务器发送更新请求 ...todoItem是对象展开运算符，用于将todoItem对象的所有属性拷贝到新对象中
+    await apiUpdateTodo(todoId, { ...todoItem, isCompleted: newStatus } as TodoForm)
+    todoItem.isCompleted = newStatus
+    todoItem.updatedAt = new Date().toISOString()
   }
 
   // 添加待办事项
-  const addTodo = async (currentTodo: TodoItem) => {
-    try {
-      const newTodo = await apiAddTodo({ ...currentTodo, id: Date.now(), updatedAt: new Date()})
-      todoList.value.push(newTodo)
-    } catch{
-      ElMessage.error('添加失败')
-    }
+  const addTodo = async (todoForm: TodoForm) => {
+    const { deadline, reminderTime } = covertDeadlineAndReminderTime(
+      todoForm.deadline,
+      todoForm.reminderTime,
+    )
+    const newTodo = await apiAddTodo({
+      ...todoForm,
+      deadline: deadline,
+      reminderTime: reminderTime,
+    })
+    todoList.value.push(newTodo)
+    return newTodo
   }
   // 更新待办事项
-  const updateTodo = async (currentTodo: TodoItem) => {
-    try {
-      const newTodo = await apiUpdateTodo({...currentTodo, updatedAt: new Date()})
-      todoList.value = todoList.value.map((t) => (t.id === newTodo.id ? newTodo : t))
-    } catch{
-      ElMessage.error('更新失败')
-    }
+  const updateTodo = async (todoForm: TodoForm) => {
+    const { deadline, reminderTime } = covertDeadlineAndReminderTime(
+      todoForm.deadline,
+      todoForm.reminderTime,
+    )
+    const newTodo = await apiUpdateTodo(currentTodoId.value, {
+      ...todoForm,
+      deadline: deadline,
+      reminderTime: reminderTime,
+    })
+    todoList.value = todoList.value.map((t) => (t.id === newTodo.id ? newTodo : t))
+    return newTodo
   }
   // 删除待办事项
   const deleteTodo = async (todoId: number) => {
-    try {
-      await apiDeleteTodo(todoId) // 调用 API
-      todoList.value = todoList.value.filter((t) => t.id !== todoId) // 仅当 API 成功时删除前端数据
-    } catch {
-      ElMessage.error('删除失败，请重试') // 显示错误提示
-    }
+    const resId = await apiDeleteTodo(todoId) // 调用 API
+    todoList.value = todoList.value.filter((t) => t.id !== resId)
   }
+  // 获取当前待办事项
+  const getCurrentTodo = () => todoList.value.find((t) => t.id === currentTodoId.value)
   return {
     todoList,
     loading,
-    currentTodo,
     groupTodoList,
-    currentTodoCache,
+    currentTodoId,
     getCategory,
     loadTodoList,
-    resetTodoForm,
     toggleTodoStatus,
     addTodo,
     updateTodo,
     deleteTodo,
+    getCurrentTodo,
   }
 })

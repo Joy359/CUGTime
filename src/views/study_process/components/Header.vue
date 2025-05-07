@@ -14,7 +14,7 @@ import { Document, Refresh, Search } from '@element-plus/icons-vue'
     </div>
     <!-- 查询操作 -->
     <div class="search-section">
-      <el-input placeholder="请输入过程标题查询" :prefix-icon="Search" />
+      <el-input placeholder="请输入过程内容查询" :prefix-icon="Search" />
       <el-button :icon="Search" plain>查询</el-button>
       <el-button :icon="Refresh" type="info" plain>重置</el-button>
     </div>

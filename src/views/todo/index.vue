@@ -1,14 +1,7 @@
 <script setup lang="ts">
 import Header from '@/views/todo/components/Header.vue'
 import Main from '@/views/todo/components/Main.vue'
-import { onMounted } from 'vue'
-import { useTodoStore } from '@/store/todo'
 import DialogTodo from '@/views/todo/components/DialogTodo.vue'
-
-const todoStore = useTodoStore()
-onMounted(async () => {
-  await todoStore.loadTodoList()
-})
 </script>
 
 <template>

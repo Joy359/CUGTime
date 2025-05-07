@@ -1,13 +1,10 @@
 <script setup lang="ts">
 import { Document, Plus, Refresh, Search } from '@element-plus/icons-vue'
 import { useDialogStore } from '@/store/dialog.ts'
-import { usePlanStore } from '@/store/plan.ts'
 
 const dialogStore = useDialogStore()
-const planStore = usePlanStore()
 const handleAdd = () => {
-  planStore.resetPlanForm()
-  dialogStore.open('plan_add', '新建计划')
+  dialogStore.open('plan', 'add','新建计划')
 }
 </script>
 <template>

@@ -2,7 +2,6 @@
 import { Calendar, Plus } from '@element-plus/icons-vue'
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { dayjs } from 'element-plus'
-import { useTodoStore } from '@/store/todo.ts'
 import { useDialogStore } from '@/store/dialog.ts'
 // 动态时间处理
 const currentTime = ref('')
@@ -21,12 +20,10 @@ onBeforeUnmount(() => {
   clearInterval(timer)
 })
 
-const todoStore = useTodoStore()
 const dialogStore = useDialogStore()
 
 const handleAddTodo = () => {
-  todoStore.resetTodoForm()
-  dialogStore.open('todo_add','新建待办')
+  dialogStore.open('todo','add','新建待办')
 }
 </script>
 

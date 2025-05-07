@@ -1,17 +1,114 @@
 <script setup lang="ts">
 import { useTodoStore } from '@/store/todo.ts'
 import { storeToRefs } from 'pinia'
-import { ElMessage } from 'element-plus'
-import type { CategoryMap } from '@/types/todo'
+import type { CategoryMap, TodoForm } from '@/types/todo'
 import { Bell, Calendar, CircleCheck, Refresh, Warning } from '@element-plus/icons-vue'
-import { isEqual } from 'lodash-es'
-import { setDefaultTime } from '@/utils/time-utils.ts'
+import { setDefaultTime } from '@/utils/timeHelper.ts'
 import { useDialogStore } from '@/store/dialog.ts'
-
-const todoStore = useTodoStore()
+import { computed, ref } from 'vue'
+import BaseDialogForm, { type DialogConfig } from '@/components/BaseDialogForm.vue'
+import { ElMessage } from 'element-plus'
 const dialogStore = useDialogStore()
-const { currentTodo, currentTodoCache } = storeToRefs(todoStore)
+const todoStore = useTodoStore()
+const { title } = storeToRefs(dialogStore)
+const { getCurrentTodo } = todoStore
 const { getCategory } = useTodoStore()
+const dialogVisible = dialogStore.visible('todo')
+const todoForm = ref<TodoForm>({ priority: 'medium', isCompleted: false } as TodoForm)
+const todoDialogConfig = ref<DialogConfig<TodoForm>>({
+  title: title,
+  formItems: [
+    {
+      label: '标题',
+      prop: 'title',
+      type: 'input',
+      placeholder: '请输入计划标题',
+      required: true,
+    },
+    {
+      label: '优先级',
+      prop: 'priority',
+      type: 'radio',
+      options: [
+        { label: '忽略', value: 'low' },
+        { label: '普通', value: 'medium' },
+        { label: '重要', value: 'high' },
+      ],
+      required: true,
+    },
+    {
+      label: '完成情况',
+      prop: 'isCompleted',
+      type: 'switch',
+      switchConfig: {
+        activeText: '已完成',
+        inactiveText: '未完成',
+      },
+      required: true,
+    },
+    {
+      label: '截止日期',
+      prop: 'deadline',
+      type: 'datetime',
+      dateConfig: {
+        valueFormat: 'YYYY-MM-DDTHH:mm',
+        format: 'YYYY-MM-DD HH:mm',
+        defaultTime: setDefaultTime(),
+        placement: 'right-start',
+      },
+      required: false,
+    },
+    {
+      label: '提醒时间',
+      prop: 'reminderTime',
+      type: 'select',
+      required: false,
+      options: [
+        { label: '无', value: 0 },
+        { label: '准时', value: 0 },
+        { label: '5分钟前', value: 5 },
+        { label: '10分钟前', value: 10 },
+        { label: '15分钟前', value: 15 },
+        { label: '30分钟前', value: 30 },
+        { label: '1小时前', value: 60 },
+        { label: '2小时前', value: 120 },
+        { label: '一周前', value: 10080 },
+        { label: '自定义', value: -1 },
+      ],
+      // 动态显示逻辑
+      visible: computed(() => !!todoForm.value.deadline),
+    },
+    {
+      label: '描述',
+      prop: 'description',
+      type: 'textarea',
+      placeholder: '请输入计划描述',
+      required: false,
+    },
+  ],
+  submitHandler: async (data) => {
+    // 提交数据
+    if (dialogStore.mode === 'add') {
+      const newTodo = await todoStore.addTodo(data)
+      console.log('newTodo', newTodo)
+      ElMessage.success({
+        message: `已添加任务：${newTodo.title} ==> ${categoryMap[getCategory(newTodo)].label}`,
+        duration: 3000,
+      })
+    }
+    if (dialogStore.mode === 'edit') {
+      console.log(data)
+      const newTodo = await todoStore.updateTodo(data)
+      ElMessage.success({
+        message: `已更新任务：${newTodo.title} ===> ${categoryMap[getCategory(newTodo)].label}`,
+        duration: 3000,
+      })
+    }
+  },
+  cacheCheck: true,
+  cacheData: computed(() => getCurrentTodo() as unknown as TodoForm),
+})
+
 const categoryMap: CategoryMap = {
   today: { label: '今日任务', icon: Calendar },
   tomorrow: { label: '明日任务', icon: Bell },
@@ -20,89 +117,15 @@ const categoryMap: CategoryMap = {
   noDate: { label: '无日期', icon: CircleCheck },
   completed: { label: '已完成', icon: CircleCheck },
 }
-const dialogVisible = dialogStore.visible('todo')
-let warningMessage: { close: () => void } | null = null
-const handleAddTodo = () => {
-  // 清除已有警告提示
-  if (warningMessage) {
-    warningMessage.close()
-  }
-  if (!currentTodo.value.title) {
-    warningMessage = ElMessage.warning('请填写标题')
-    return
-  }
-  todoStore.addTodo(currentTodo.value).then(() => {
-    warningMessage = null
-    ElMessage.success({
-      message: `已添加任务：${currentTodo.value.title} ==> ${categoryMap[getCategory(currentTodo.value)].label}`,
-      duration: 3000,
-    })
-    dialogStore.close('todo_add')
-  })
-}
-
-const handleUpdateTodo = () => {
-  // 清除已有警告提示
-  if (warningMessage) {
-    warningMessage.close()
-  }
-  if (!currentTodo.value.title) {
-    warningMessage = ElMessage.warning('请填写标题')
-    return
-  }
-  if (isEqual(currentTodo.value, currentTodoCache.value)) {
-    warningMessage = ElMessage.warning('未作任何修改')
-    return
-  }
-  todoStore.updateTodo(currentTodo.value).then(() => {
-    warningMessage = null
-    ElMessage.success({
-      message: `已更新任务：${currentTodo.value.title} ===> ${categoryMap[getCategory(currentTodo.value)].label}`,
-      duration: 3000,
-    })
-    dialogStore.close('todo_edit')
-  })
-}
 </script>
 
 <template>
-  <el-dialog v-model="dialogVisible" :title="dialogStore.title" class="my-global-dialog">
-    <el-form :model="currentTodo" class="my-global-form">
-      <el-form-item label="标题" required>
-        <el-input v-model="currentTodo.title" placeholder="标题"></el-input>
-      </el-form-item>
-      <el-form-item label="优先级">
-        <el-radio-group v-model="currentTodo.priority">
-          <el-radio value="low">忽略</el-radio>
-          <el-radio value="medium">普通</el-radio>
-          <el-radio value="high">重要</el-radio>
-        </el-radio-group>
-      </el-form-item>
-      <el-form-item label="截止日期">
-        <el-date-picker
-          v-model="currentTodo.deadline"
-          type="datetime"
-          placeholder="选择日期和时间"
-          format="YYYY/MM/DD HH:mm"
-          :default-time="setDefaultTime()"
-          placement="right-start"
-        />
-      </el-form-item>
-      <el-form-item label="状态">
-        <el-switch v-model="currentTodo.isCompleted" active-text="已完成" inactive-text="进行中" />
-      </el-form-item>
-      <el-form-item label="描述">
-        <el-input v-model="currentTodo.description" type="textarea" placeholder="描述"></el-input>
-      </el-form-item>
-    </el-form>
-    <template #footer>
-      <el-button @click="dialogStore.closeAll('todo')">取消</el-button>
-      <el-button type="primary" @click="handleAddTodo" v-if="dialogStore.title ==='新建待办'">
-        确认添加
-      </el-button>
-      <el-button type="primary" @click="handleUpdateTodo" v-else>确认更新</el-button>
-    </template>
-  </el-dialog>
+  <BaseDialogForm
+    :dialog-type="dialogStore.mode"
+    v-model:visible="dialogVisible"
+    v-model:form-data="todoForm"
+    :config="todoDialogConfig"
+  ></BaseDialogForm>
 </template>
 
 <style scoped lang="scss"></style>

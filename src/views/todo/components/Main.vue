@@ -6,7 +6,7 @@ import { storeToRefs } from 'pinia'
 import type { CategoryMap, TodoItem } from '@/types/todo'
 import CategoryHeader from '@/views/todo/components/CategoryHeader.vue'
 import TaskItem from '@/views/todo/components/TaskItem.vue'
-import { isRecentUpdate } from '@/utils/time-utils.ts'
+import { isRecentUpdate } from '@/utils/timeHelper.ts'
 const todoStore = useTodoStore()
 const { groupTodoList } = storeToRefs(todoStore)
 const categoryMap: CategoryMap = {
@@ -20,7 +20,7 @@ const categoryMap: CategoryMap = {
 
 // 判断是否有最近更新
 const hasRecentUpdate = (items: TodoItem[]) =>
-  items.some((item) => isRecentUpdate(item.updatedAt))
+  items.some((item) => isRecentUpdate(new Date(item.updatedAt)))
 </script>
 
 <template>

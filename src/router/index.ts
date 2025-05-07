@@ -1,4 +1,4 @@
-// src/router/index.ts
+
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { routes } from './routes.ts'
 const router = createRouter({

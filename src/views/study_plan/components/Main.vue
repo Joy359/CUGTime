@@ -1,34 +1,23 @@
 <script lang="ts" setup>
-import { dayjs, ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox } from 'element-plus'
 import { computed } from 'vue'
 import { usePlanStore } from '@/store/plan.ts'
-import { storeToRefs } from 'pinia'
-import type { PlanItem } from '@/types/plan'
-import { myFormatDate } from '@/utils/time-utils.ts'
+import { myFormatDate } from '@/utils/timeHelper.ts'
 import { useDialogStore } from '@/store/dialog.ts'
-import { cloneDeep } from 'lodash-es'
 import { useProcessStore } from '@/store/process.ts'
 
 const planStore = usePlanStore()
 const dialogStore = useDialogStore()
 const processStore = useProcessStore()
-const { currentPlan, currentPlanCache } = storeToRefs(planStore)
-const { deletePlan } = planStore
-
-// // 组件挂载时自动加载数据
-// onMounted(() => {
-//   loadPlanMap()
-// })
 
 const tableData = computed(() => Array.from(planStore.planMap.values()))
 const handleViewProgress = (planId: number) => {
-  currentPlan.value.id = planId
-  dialogStore.open('_show', '学习过程')
+  planStore.currentPlanId = planId
+  dialogStore.open('processView','', '学习过程')
 }
 const handleAddProgress = (planId: number) => {
-  currentPlan.value.id = planId
-  processStore.resetProcessForm()
-  dialogStore.open('process_add', '记录学习过程')
+  planStore.currentPlanId = planId
+  dialogStore.open('process','add', '记录学习过程')
 }
 const handleDelete = (id: number) => {
   ElMessageBox.confirm('确定永久删除该任务？', '警告', {
@@ -37,15 +26,13 @@ const handleDelete = (id: number) => {
     type: 'warning',
     distinguishCancelAndClose: true,
   }).then(() => {
-    deletePlan(id)
+    planStore.deletePlan(id)
     ElMessage.success('删除成功')
   })
 }
-const handleEdit = (planItem: PlanItem) => {
-  dialogStore.open('plan_edit', '编辑计划')
-  Object.assign(currentPlan.value, planItem)
-  // 数据缓存
-  currentPlanCache.value = cloneDeep(currentPlan.value)
+const handleEdit = (planId: number) => {
+  planStore.currentPlanId = planId
+  dialogStore.open('plan','edit', '编辑计划')
 }
 </script>
 
@@ -58,11 +45,10 @@ const handleEdit = (planItem: PlanItem) => {
     row-class-name="table-row"
     :default-sort="{ prop: 'createdAt', order: 'descending' }"
   >
-    <el-table-column type="selection" width="48" align="center" />
-    <el-table-column prop="title" label="计划标题" width="180" />
+    <el-table-column prop="title" label="计划标题" width="180" align="center"/>
     <el-table-column prop="startTime" label="开始时间" width="120" align="center" sortable>
       <template #default="scope">
-        {{ dayjs(scope.row.startTime).format('MM-DD hh:mm') }}
+        {{ myFormatDate(scope.row.startTime) }}
       </template>
     </el-table-column>
     <el-table-column prop="endTime" label="结束时间" width="120" align="center" sortable>
@@ -93,7 +79,7 @@ const handleEdit = (planItem: PlanItem) => {
       <template #default="scope">
         <div class="action-buttons">
           <el-button type="success" link @click="handleAddProgress(scope.row.id)">记录</el-button>
-          <el-button type="primary" link @click="handleEdit(scope.row)">编辑</el-button>
+          <el-button type="primary" link @click="handleEdit(scope.row.id)">编辑</el-button>
           <el-button type="danger" link @click="handleDelete(scope.row.id)">删除</el-button>
         </div>
       </template>

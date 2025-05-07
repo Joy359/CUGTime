@@ -6,12 +6,16 @@ import Footer from './footer/Footer.vue'
 import { onMounted } from 'vue'
 import { useProcessStore } from '@/store/process.ts'
 import { usePlanStore } from '@/store/plan.ts'
+import { useTodoStore } from '@/store/todo.ts'
+
 const processStore = useProcessStore()
+const todoStore = useTodoStore()
 const planStore = usePlanStore()
 // 组件挂载时自动加载数据
 onMounted(() => {
   planStore.loadPlanMap()
   processStore.loadProcessMap()
+  todoStore.loadTodoList()
 })
 </script>
 

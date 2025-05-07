@@ -19,20 +19,11 @@ export const routes = [
         },
       },
       {
-        path: '/calendar',
-        component: () => import('@/views/schedule_calendar/index.vue'),
-        name: 'calendar',
-        meta: {
-          title: '日程日历',
-          show: true,
-        },
-      },
-      {
         path: '/course',
-        component: () => import('@/views/course_manager/index.vue'),
+        component: () => import('@/views/course/index.vue'),
         name: 'course',
         meta: {
-          title: '课表管理',
+          title: '课程课表',
           show: true,
         },
       },
@@ -70,6 +61,15 @@ export const routes = [
         name: 'todo',
         meta: {
           title: '待办事项',
+          show: true,
+        },
+      },
+       {
+        path: '/calendar',
+        component: () => import('@/views/calendar/index.vue'),
+        name: 'calendar',
+        meta: {
+          title: '日程日历',
           show: true,
         },
       },

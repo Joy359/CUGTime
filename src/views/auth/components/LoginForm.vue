@@ -2,10 +2,14 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, type FormInstance } from 'element-plus'
+import type { LoginForm } from '@/types/auth.ts'
+import { login } from '@/api/auth'
+import { useUserStore } from '@/store/user.ts'
 
 const router = useRouter()
-const formEl = ref<FormInstance>() // 声明表单实例
-const form = reactive({
+const userStore = useUserStore()
+const formRef = ref<FormInstance>() // 声明表单实例
+const form = reactive<LoginForm>({
   username: '',
   password: '',
 })
@@ -16,24 +20,29 @@ const rules = {
   password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
 }
 const clearValidateField = (field: 'username' | 'password') => {
-  if (formEl.value) {
-    formEl.value.clearValidate([field]) // 清除指定字段的验证提示
+  if (formRef.value) {
+    formRef.value.clearValidate([field]) // 清除指定字段的验证提示
   }
 }
 // 登录方法
-const login = async () => {
+const handleLogin = async () => {
+  if (!formRef.value) return
   try {
-    if (!formEl.value) return
-    await formEl.value.validate() // 触发验证
-
+    await formRef.value.validate() // 触发验证
     // 验证通过后执行登录逻辑
-    if (form.username === 'admin' && form.password === '123') {
-      await router.push('/home')
-    } else {
-      ElMessage.error('账号或密码错误')
-    }
+    const response = await login(form)
+    userStore.userInfo.token = response.token
+    userStore.userInfo.username = response.username
+    userStore.loginTime = new Date()
+    // token 本地存储
+    localStorage.setItem('token', response.token)
+    localStorage.setItem('username', response.username)
+    console.log(response.username)
+    console.log(localStorage.getItem('username'))
+    await router.push('/home')
+    ElMessage.success('登录成功')
   } catch {
-    ElMessage.error('表单验证失败，请检查输入')
+    return
   }
 }
 
@@ -48,7 +57,7 @@ const register = () => {
 <template>
   <div class="container">
     <h2 class="header">登录</h2>
-    <el-form ref="formEl" class="login-form" :rules="rules" :model="form">
+    <el-form ref="formRef" class="login-form" :rules="rules" :model="form">
       <el-form-item class="username" prop="username">
         <el-input
           v-model="form.username"
@@ -68,7 +77,7 @@ const register = () => {
         ></el-input>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" class="login" @click="login">登录</el-button>
+        <el-button type="primary" class="login" @click="handleLogin">登录</el-button>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" link class="forgot-password" @click="forgot_password">
